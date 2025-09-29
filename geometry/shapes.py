@@ -14,6 +14,10 @@ class Shape(ABC):
 class Circle(Shape):
     radius: float
 
+    def __post_init__(self):
+        if not (self.radius is not None and self.radius > 0):
+            raise ValueError("Radius must be positive")
+
     def get_area(self) -> float:
         return self.radius ** 2 * pi
 
@@ -24,10 +28,17 @@ class Triangle(Shape):
     b: float
     c: float
 
+    def __post_init__(self):
+        x, y, z = sorted((self.a, self.b, self.c))
+        if x <= 0:
+            raise ValueError("Sides must be positive")
+        if z >= x + y:
+            raise ValueError("Triangle is degenerate")
+
     def get_area(self) -> float:
         p = 0.5 * (self.a + self.b + self.c)
         return (p * (p - self.a) * (p - self.b) * (p - self.c)) ** 0.5
 
     def is_right_triangle(self, eps: float = 1e-9) -> bool:
         x, y, z = sorted((self.a, self.b, self.c))
-        return z ** 2 - x ** 2 - y ** 2 < eps * (x * x + y * y + z * z)
+        return abs(z ** 2 - x ** 2 - y ** 2) < eps
